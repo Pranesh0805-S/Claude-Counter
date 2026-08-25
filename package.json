@@ -1,0 +1,11 @@
+{
+  "name": "claude-usage-companion",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "build": "npm run build -w @companion/core && npm run build -w @companion/extension && npm run build -w @companion/desktop",
+    "test": "npm run test -w @companion/core"
+  },
+  "devDependencies": {"typescript": "^5.7.3", "@types/node": "^22.10.2"}
+}
