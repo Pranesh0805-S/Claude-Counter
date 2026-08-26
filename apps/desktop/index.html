@@ -1,1 +1,41 @@
-<!doctype html><html><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Claude Usage Companion</title></head><body><main><header><div><p class="eyebrow">LOCAL COMPANION</p><h1>API usage, in one quiet place.</h1></div><button id="refresh">Refresh</button></header><section class="stats"><article><span>Total tokens</span><strong id="tokens">—</strong><small id="period">Last 7 days</small></article><article><span>Tracked models</span><strong id="models">—</strong><small>Admin API report</small></article></section><section class="panel"><h2>Connect Anthropic Admin API</h2><p>An Admin API key is required for official API reporting. It stays encrypted on this computer and is sent only to api.anthropic.com.</p><form id="key-form"><input id="key" type="password" autocomplete="off" placeholder="sk-ant-admin…"/><button>Save key</button></form><p class="note" id="status">Not connected.</p></section><section class="panel"><h2>What this can—and can’t—track</h2><p>Tracks official Console API token reports (including cache tokens) and can run beside Claude Desktop. Claude subscription 5-hour / weekly windows are not publicly exposed to companion apps; use the included browser extension for those when using claude.ai in a browser.</p></section></main><script type="module" src="/src/main.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Claude Usage Companion</title>
+  </head>
+  <body>
+    <div class="app-loader" id="app-loader" role="status" aria-live="polite">
+      <div class="loader-mark">C</div><strong>Claude Usage Companion</strong>
+      <span class="loader-line"><i></i></span><small>Preparing your local dashboard</small>
+    </div>
+    <main class="app-shell" aria-busy="true">
+      <header class="topbar">
+        <div class="brand"><div class="brand-mark">C</div><div><strong>Claude Usage Companion</strong><span>Local Admin API reporting</span></div></div>
+        <div class="topbar-actions">
+          <label class="theme-control" for="theme"><span aria-hidden="true">◐</span><span class="sr-only">Color theme</span><select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+        <div class="topbar-actions">
+          <div class="connection" id="connection"><span class="status-dot"></span><span>Checking connection</span></div>
+        </div>
+        </div>
+      </header>
+      <section class="hero">
+        <div><p class="eyebrow">USAGE OVERVIEW</p><h1>Your API usage,<br /><em>kept local.</em></h1><p class="hero-copy">View your official Anthropic Console usage report without sending data anywhere except Anthropic’s documented Admin API.</p></div>
+        <button class="button button-primary" id="refresh" type="button"><span class="button-label">Refresh report</span><span class="spinner" aria-hidden="true"></span></button>
+      </section>
+      <section class="stats" aria-label="Usage statistics">
+        <article class="stat-card"><div class="stat-heading"><span>Total tokens</span><span class="stat-icon">↗</span></div><strong id="tokens" class="skeleton">—</strong><small id="period">Last 7 days</small></article>
+        <article class="stat-card"><div class="stat-heading"><span>Tracked models</span><span class="stat-icon">◌</span></div><strong id="models" class="skeleton">—</strong><small>Included in the report</small></article>
+      </section>
+      <section class="panel connection-panel">
+        <div class="panel-heading"><div><p class="eyebrow">CONNECTION</p><h2>Anthropic Admin API</h2></div><span class="secure-label">Encrypted on this device</span></div>
+        <p>Enter an Admin API key to load official usage totals. The key is stored using your operating system’s encryption and never reaches the app interface after saving.</p>
+        <form id="key-form"><label class="sr-only" for="key">Anthropic Admin API key</label><input id="key" type="password" autocomplete="off" placeholder="sk-ant-admin…" /><button class="button button-secondary" id="save-key" type="submit"><span class="button-label">Save key</span><span class="spinner" aria-hidden="true"></span></button></form>
+        <p class="status-message" id="status" role="status">Checking saved connection…</p>
+      </section>
+      <section class="notice"><div class="notice-icon">i</div><div><h2>What this app tracks</h2><p>Official Console API token reports, including cache tokens. Subscription usage windows in Claude Desktop are not public API data; use the included browser extension for best-effort Claude web tracking.</p></div></section>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, safeStorage } from "electron";
 import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 const keyFile = () => join(app.getPath("userData"), "admin-key.bin");
 async function getKey() { if (!existsSync(keyFile())) return null; if (!safeStorage.isEncryptionAvailable()) throw new Error("OS encryption is unavailable; key was not read."); return safeStorage.decryptString(await readFile(keyFile())); }
 async function fetchReport() {
@@ -14,6 +15,6 @@ async function fetchReport() {
   for (const bucket of body.data ?? []) for (const r of bucket.results ?? []) { models.add(r.model); totalTokens += (r.uncached_input_tokens||0)+(r.output_tokens||0)+(r.cache_read_input_tokens||0)+Object.values(r.cache_creation||{}).reduce((a,b)=>a+b,0); }
   return {totalTokens,models:models.size,days:7};
 }
-function createWindow(){const win=new BrowserWindow({width:900,height:720,webPreferences:{contextIsolation:true,nodeIntegration:false,preload:join(import.meta.dirname,"preload.mjs")}}); const dev=process.env.VITE_DEV_SERVER_URL; win.loadURL(dev || `file://${join(import.meta.dirname,"../dist/index.html")}`);}
+function createWindow(){const win=new BrowserWindow({width:900,height:720,minWidth:720,minHeight:600,backgroundColor:"#f4f7f5",webPreferences:{contextIsolation:true,nodeIntegration:false,preload:join(import.meta.dirname,"preload.mjs")}}); const dev=process.env.VITE_DEV_SERVER_URL; win.loadURL(dev || pathToFileURL(join(import.meta.dirname,"../renderer-dist/index.html")).toString());}
 app.whenReady().then(()=>{ipcMain.handle("has-key",async()=>Boolean(await getKey()));ipcMain.handle("save-key",async(_,key)=>{if(typeof key!=="string"||key.length<10)throw new Error("Enter a valid Admin API key.");if(!safeStorage.isEncryptionAvailable())throw new Error("OS encryption is unavailable; refusing to store the key.");await writeFile(keyFile(),safeStorage.encryptString(key));});ipcMain.handle("get-report",fetchReport);createWindow();});
 app.on("window-all-closed",()=>{if(process.platform!=="darwin")app.quit();});

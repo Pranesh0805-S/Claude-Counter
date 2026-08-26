@@ -1,2 +1,7 @@
 import { defineConfig } from "vite";
-export default defineConfig({build:{outDir:"dist", emptyOutDir:true}});
+
+// Keep the renderer separate from Electron Builder's installer output.
+export default defineConfig({
+  base: "./",
+  build: { outDir: "renderer-dist", emptyOutDir: true },
+});
