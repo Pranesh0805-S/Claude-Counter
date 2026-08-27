@@ -5,6 +5,7 @@ const loader = $("#app-loader");
 const app = $(".app-shell");
 const refreshButton = $("#refresh");
 const saveButton = $("#save-key");
+const removeButton = $("#remove-key");
 const status = $("#status");
 const connection = $("#connection");
 const themeSelect = $("#theme");
@@ -115,6 +116,21 @@ $("#key-form").addEventListener("submit", async (event) => {
   } catch (error) {
     setStatus(error.message || "Unable to save the API key.", "error");
   } finally { setButtonLoading(saveButton, false); }
+});
+
+removeButton.addEventListener("click", async () => {
+  if (!confirm("Remove the encrypted Admin API key from this device?")) return;
+  setButtonLoading(removeButton, true, "Removing");
+  try {
+    await window.usage.removeKey();
+    localStorage.removeItem(HISTORY_KEY);
+    $("#history-chart").replaceChildren();
+    $("#history-empty").hidden = false;
+    $("#tokens").textContent = "—";
+    $("#models").textContent = "—";
+    setStatus("Saved key and local usage history removed.", "neutral");
+  } catch (error) { setStatus(error.message || "Unable to remove the saved key.", "error"); }
+  finally { setButtonLoading(removeButton, false); }
 });
 
 async function initialize() {

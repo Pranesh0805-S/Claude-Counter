@@ -27,7 +27,7 @@
       <section class="panel connection-panel">
         <div class="panel-heading"><div><p class="eyebrow">CONNECTION</p><h2>Anthropic Admin API</h2></div><span class="secure-label">Encrypted on this device</span></div>
         <p>Enter an Admin API key to load official usage totals. The key is stored using your operating system’s encryption and never reaches the app interface after saving.</p>
-        <form id="key-form"><label class="sr-only" for="key">Anthropic Admin API key</label><input id="key" type="password" autocomplete="off" placeholder="sk-ant-admin…" /><button class="button button-secondary" id="save-key" type="submit"><span class="button-label">Save key</span><span class="spinner" aria-hidden="true"></span></button></form>
+        <form id="key-form"><label class="sr-only" for="key">Anthropic Admin API key</label><input id="key" type="password" autocomplete="off" placeholder="sk-ant-admin…" /><button class="button button-secondary" id="save-key" type="submit"><span class="button-label">Save key</span><span class="spinner" aria-hidden="true"></span></button><button class="button button-danger" id="remove-key" type="button">Remove saved key</button></form>
         <p class="status-message" id="status" role="status">Checking saved connection…</p>
       </section>
       <section class="notice"><div class="notice-icon">i</div><div><h2>What this app tracks</h2><p>Official Console API token reports, including cache tokens. Subscription usage windows in Claude Desktop are not public API data; use the included browser extension for best-effort Claude web tracking.</p></div></section>
