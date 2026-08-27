@@ -12,6 +12,17 @@ const themeSelect = $("#theme");
 const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
 const HISTORY_KEY = "usage-history";
 
+window.addEventListener("error", (event) => {
+  console.error("Claude Usage Companion renderer error:", event.error || event.message);
+  loader?.classList.add("is-hidden");
+  if (status) setStatus("The dashboard encountered a startup error. Try Refresh.", "error");
+});
+window.addEventListener("unhandledrejection", (event) => {
+  console.error("Claude Usage Companion startup rejection:", event.reason);
+  loader?.classList.add("is-hidden");
+  if (status) setStatus("The dashboard could not finish loading. Try Refresh.", "error");
+});
+
 function renderHistory(history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]")) {
   const chart = $("#history-chart");
   const empty = $("#history-empty");
@@ -81,6 +92,12 @@ function setStatsLoading(isLoading) {
   [$("#tokens"), $("#models")].forEach((element) => element.classList.toggle("skeleton", isLoading));
 }
 
+function withTimeout(promise, milliseconds, message) {
+  let timer;
+  const timeout = new Promise((_, reject) => { timer = window.setTimeout(() => reject(new Error(message)), milliseconds); });
+  return Promise.race([promise, timeout]).finally(() => window.clearTimeout(timer));
+}
+
 async function refresh() {
   setButtonLoading(refreshButton, true, "Refreshing");
   setStatsLoading(true);
@@ -137,7 +154,7 @@ async function initialize() {
   initializeTheme();
   renderHistory();
   try {
-    if (await window.usage.hasKey()) await refresh();
+    if (await withTimeout(window.usage.hasKey(), 5000, "Startup check timed out. Try refreshing the app.")) await refresh();
     else setStatus("Add an Admin API key to load your official usage report.", "neutral");
   } catch (error) { setStatus(error.message || "Unable to check the saved connection.", "error"); }
   finally {

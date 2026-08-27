@@ -10,6 +10,16 @@
       <div class="loader-mark">C</div><strong>Claude Usage Companion</strong>
       <span class="loader-line"><i></i></span><small>Preparing your local dashboard</small>
     </div>
+    <script>
+      window.setTimeout(() => {
+        const loader = document.getElementById("app-loader");
+        if (loader && !loader.classList.contains("is-hidden")) {
+          loader.classList.add("is-hidden");
+          const status = document.getElementById("status");
+          if (status) status.textContent = "Startup is taking longer than expected. You can still try Refresh.";
+        }
+      }, 6000);
+    </script>
     <main class="app-shell" aria-busy="true">
       <header class="topbar">
         <div class="brand"><div class="brand-mark">C</div><div><strong>Claude Usage Companion</strong><span>Local Admin API reporting</span></div></div>
