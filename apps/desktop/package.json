@@ -5,5 +5,5 @@
   "main": "electron/main.mjs",
   "scripts": {"dev": "vite --host 127.0.0.1", "start": "vite build && electron .", "build:renderer": "vite build", "build": "vite build && electron-builder"},
   "devDependencies": {"electron": "36.9.5", "electron-builder": "^26.0.0", "vite": "^6.0.0"},
-  "build": {"appId":"com.local.claudeusagecompanion","productName":"Claude Usage Companion","files":["renderer-dist/**","electron/**","package.json"],"win":{"target":"nsis"}}
+  "build": {"appId":"com.local.claudeusagecompanion","productName":"Claude Usage Companion","files":["renderer-dist/**","electron/**","package.json"],"win":{"target":"nsis"},"mac":{"target":"dmg"},"linux":{"target":"AppImage","category":"Utility"}}
 }

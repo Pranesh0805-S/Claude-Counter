@@ -27,6 +27,17 @@ npm run build
 
 For the desktop app, run `npm run start -w @companion/desktop`. Load the extension build output from `apps/extension/dist` as an unpacked Chromium extension. During extension development, use `npm run build -w @companion/extension` after changes.
 
+## Publishing a release
+
+Push a semantic version tag to build and publish installers automatically for Windows, macOS, and Linux:
+
+```sh
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+The release workflow uses GitHub's temporary `GITHUB_TOKEN`; no Anthropic key is used during builds.
+
 ## Limitations and ethics
 
 Claude web response shapes can change without notice, so web tracking is best-effort and does not bypass limits. The extension is intentionally scoped to `claude.ai` and forwards only detected usage metadata to its own local storage. Admin usage requires an Anthropic **Admin API key**, not a standard API key.
