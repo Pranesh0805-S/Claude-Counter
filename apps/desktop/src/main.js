@@ -12,6 +12,7 @@ const themeSelect = $("#theme");
 const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
 const periodSelect = $("#period-select");
 const HISTORY_KEY = "usage-history";
+const exportCsvButton = $("#export-csv");
 
 window.addEventListener("error", (event) => {
   console.error("Claude Usage Companion renderer error:", event.error || event.message);
@@ -55,6 +56,15 @@ function saveHistory(daily) {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
   renderHistory(history);
 }
+
+exportCsvButton.addEventListener("click", async () => {
+  const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+  if (!history.length) { setStatus("Refresh a report before exporting history.", "error"); return; }
+  const escape = (value) => `"${String(value).replaceAll('"', '""')}"`;
+  const csv = ["date,total_tokens,cache_tokens", ...history.map((entry) => [entry.date, entry.tokens, entry.cacheTokens || 0].map(escape).join(","))].join("\n");
+  try { await window.usage.saveCsv(csv); setStatus("Usage history exported as CSV.", "connected"); }
+  catch (error) { setStatus(error.message || "Unable to export usage history.", "error"); }
+});
 
 function applyTheme(preference) {
   const theme = preference === "system" ? (systemTheme.matches ? "dark" : "light") : preference;

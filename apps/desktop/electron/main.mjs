@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, safeStorage } from "electron";
+import { app, BrowserWindow, ipcMain, safeStorage, dialog } from "electron";
 import { readFile, writeFile, unlink } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
@@ -27,5 +27,5 @@ async function fetchReport(_event, requestedDays = 7) {
   return {totalTokens,cacheTokens:totalCacheTokens,models:models.size,modelUsage:[...modelUsage].map(([model,tokens])=>({model,tokens})).sort((a,b)=>b.tokens-a.tokens),days,daily};
 }
 function createWindow(){const win=new BrowserWindow({width:900,height:720,minWidth:720,minHeight:600,backgroundColor:"#f4f7f5",webPreferences:{contextIsolation:true,nodeIntegration:false,preload:join(import.meta.dirname,"preload.mjs")}}); const dev=process.env.VITE_DEV_SERVER_URL; win.loadURL(dev || pathToFileURL(join(import.meta.dirname,"../renderer-dist/index.html")).toString());}
-app.whenReady().then(()=>{ipcMain.handle("has-key",async()=>Boolean(await getKey()));ipcMain.handle("save-key",async(_,key)=>{if(typeof key!=="string"||key.length<10)throw new Error("Enter a valid Admin API key.");if(!safeStorage.isEncryptionAvailable())throw new Error("OS encryption is unavailable; refusing to store the key.");await writeFile(keyFile(),safeStorage.encryptString(key));});ipcMain.handle("remove-key",async()=>{if(existsSync(keyFile())) await unlink(keyFile());});ipcMain.handle("get-report",fetchReport);createWindow();});
+app.whenReady().then(()=>{ipcMain.handle("has-key",async()=>Boolean(await getKey()));ipcMain.handle("save-key",async(_,key)=>{if(typeof key!=="string"||key.length<10)throw new Error("Enter a valid Admin API key.");if(!safeStorage.isEncryptionAvailable())throw new Error("OS encryption is unavailable; refusing to store the key.");await writeFile(keyFile(),safeStorage.encryptString(key));});ipcMain.handle("remove-key",async()=>{if(existsSync(keyFile())) await unlink(keyFile());});ipcMain.handle("save-csv",async(_,csv)=>{if(typeof csv!=="string"||csv.length>2_000_000)throw new Error("Invalid export data.");const result=await dialog.showSaveDialog({title:"Export usage history",defaultPath:"claude-usage-history.csv",filters:[{name:"CSV files",extensions:["csv"]}]});if(!result.canceled&&result.filePath) await writeFile(result.filePath,csv,"utf8");});ipcMain.handle("get-report",fetchReport);createWindow();});
 app.on("window-all-closed",()=>{if(process.platform!=="darwin")app.quit();});
