@@ -15,6 +15,7 @@ It deliberately does **not** claim to inspect the Claude Desktop application or 
 - Local-only extension history, JSON export, and reset notification
 - No prompt, conversation, cookie, or credential collection
 - Defensive schema detection so unrecognized Claude responses are ignored
+- Optional system-tray operation with Show, Refresh, and Quit actions
 
 ## Start developing
 

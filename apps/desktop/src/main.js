@@ -152,6 +152,7 @@ async function refresh() {
 }
 
 refreshButton.addEventListener("click", refresh);
+window.usage.onTrayRefresh?.(() => { void refresh(); });
 periodSelect.value = localStorage.getItem("report-period") || "7";
 periodSelect.addEventListener("change", () => { localStorage.setItem("report-period", periodSelect.value); void refresh(); });
 function configureAutoRefresh() {
