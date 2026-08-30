@@ -10,6 +10,7 @@ const status = $("#status");
 const connection = $("#connection");
 const themeSelect = $("#theme");
 const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
+const periodSelect = $("#period-select");
 const HISTORY_KEY = "usage-history";
 
 window.addEventListener("error", (event) => {
@@ -118,7 +119,7 @@ async function refresh() {
   setStatsLoading(true);
   setStatus("Fetching your official usage report…", "loading");
   try {
-    const report = await window.usage.getReport();
+    const report = await window.usage.getReport(Number(periodSelect.value));
     $("#tokens").textContent = report.totalTokens.toLocaleString();
     $("#models").textContent = String(report.models);
     $("#cache-tokens").textContent = report.cacheTokens.toLocaleString();
@@ -135,6 +136,8 @@ async function refresh() {
 }
 
 refreshButton.addEventListener("click", refresh);
+periodSelect.value = localStorage.getItem("report-period") || "7";
+periodSelect.addEventListener("change", () => { localStorage.setItem("report-period", periodSelect.value); void refresh(); });
 $("#key-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   const input = $("#key");
