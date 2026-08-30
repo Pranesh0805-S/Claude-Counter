@@ -11,6 +11,8 @@ const connection = $("#connection");
 const themeSelect = $("#theme");
 const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
 const periodSelect = $("#period-select");
+const refreshIntervalSelect = $("#refresh-interval");
+let refreshTimer;
 const HISTORY_KEY = "usage-history";
 const exportCsvButton = $("#export-csv");
 
@@ -148,6 +150,15 @@ async function refresh() {
 refreshButton.addEventListener("click", refresh);
 periodSelect.value = localStorage.getItem("report-period") || "7";
 periodSelect.addEventListener("change", () => { localStorage.setItem("report-period", periodSelect.value); void refresh(); });
+function configureAutoRefresh() {
+  window.clearInterval(refreshTimer);
+  const minutes = Number(refreshIntervalSelect.value);
+  localStorage.setItem("refresh-interval", String(minutes));
+  if (minutes > 0) refreshTimer = window.setInterval(() => { void refresh(); }, minutes * 60 * 1000);
+}
+refreshIntervalSelect.value = localStorage.getItem("refresh-interval") || "0";
+refreshIntervalSelect.addEventListener("change", configureAutoRefresh);
+configureAutoRefresh();
 $("#key-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   const input = $("#key");
