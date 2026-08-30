@@ -12,6 +12,7 @@ const themeSelect = $("#theme");
 const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
 const periodSelect = $("#period-select");
 const refreshIntervalSelect = $("#refresh-interval");
+const alertThresholdSelect = $("#alert-threshold");
 let refreshTimer;
 const HISTORY_KEY = "usage-history";
 const exportCsvButton = $("#export-csv");
@@ -136,6 +137,9 @@ async function refresh() {
     $("#models").textContent = String(report.models);
     $("#cache-tokens").textContent = report.cacheTokens.toLocaleString();
     renderModels(report.modelUsage);
+    const threshold = Number(alertThresholdSelect.value);
+    const alertKey = `threshold-alert-${periodSelect.value}-${threshold}-${new Date().toISOString().slice(0, 10)}`;
+    if (threshold > 0 && report.totalTokens >= threshold && !localStorage.getItem(alertKey)) { localStorage.setItem(alertKey, "sent"); await window.usage.notifyThreshold(report.totalTokens, threshold); }
     saveHistory(report.daily);
     $("#period").textContent = `Last ${report.days} days · updated ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
     setStatus("Report updated. Only local aggregates are displayed here.", "connected");
@@ -159,6 +163,8 @@ function configureAutoRefresh() {
 refreshIntervalSelect.value = localStorage.getItem("refresh-interval") || "0";
 refreshIntervalSelect.addEventListener("change", configureAutoRefresh);
 configureAutoRefresh();
+alertThresholdSelect.value = localStorage.getItem("alert-threshold") || "0";
+alertThresholdSelect.addEventListener("change", () => { localStorage.setItem("alert-threshold", alertThresholdSelect.value); });
 $("#key-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   const input = $("#key");
