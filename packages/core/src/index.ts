@@ -40,17 +40,19 @@ export function parseAdminUsage(payload: unknown): UsagePoint[] {
   const buckets = (payload as { data?: unknown[] })?.data;
   if (!Array.isArray(buckets)) return [];
   return buckets.flatMap(bucket => {
+    if (!bucket || typeof bucket !== "object") return [];
     const b = bucket as { ending_at?: string; results?: unknown[] };
     if (!Array.isArray(b.results)) return [];
-    return b.results.map(row => {
+    return b.results.flatMap(row => {
+      if (!row || typeof row !== "object") return [];
       const r = row as Record<string, unknown>;
-      const cache = (r.cache_creation ?? {}) as Record<string, number>;
+      const cache = r.cache_creation && typeof r.cache_creation === "object" ? r.cache_creation as Record<string, unknown> : {};
       return {
         source: "anthropic-admin" as const,
         capturedAt: b.ending_at ?? new Date().toISOString(),
         inputTokens: number(r.uncached_input_tokens), outputTokens: number(r.output_tokens),
         cacheReadTokens: number(r.cache_read_input_tokens),
-        cacheWriteTokens: Object.values(cache).reduce((sum, value) => sum + number(value), 0),
+        cacheWriteTokens: Object.values(cache).reduce<number>((sum, value) => sum + number(value), 0),
         model: typeof r.model === "string" ? r.model : undefined
       };
     });
