@@ -89,7 +89,22 @@ function setButtonLoading(button, isLoading, loadingLabel) {
 }
 
 function setStatsLoading(isLoading) {
-  [$("#tokens"), $("#models")].forEach((element) => element.classList.toggle("skeleton", isLoading));
+  [$("#tokens"), $("#models"), $("#cache-tokens")].forEach((element) => element.classList.toggle("skeleton", isLoading));
+}
+
+function renderModels(models = []) {
+  const list = $("#model-list");
+  const empty = $("#model-empty");
+  list.replaceChildren();
+  empty.hidden = models.length > 0;
+  const max = Math.max(...models.map((entry) => entry.tokens), 1);
+  for (const entry of models) {
+    const row = document.createElement("div"); row.className = "model-row";
+    const name = document.createElement("span"); name.textContent = entry.model || "Unknown model";
+    const value = document.createElement("strong"); value.textContent = entry.tokens.toLocaleString();
+    const bar = document.createElement("i"); bar.style.width = `${Math.max((entry.tokens / max) * 100, 3)}%`;
+    row.append(name, value, bar); list.append(row);
+  }
 }
 
 function withTimeout(promise, milliseconds, message) {
@@ -106,6 +121,8 @@ async function refresh() {
     const report = await window.usage.getReport();
     $("#tokens").textContent = report.totalTokens.toLocaleString();
     $("#models").textContent = String(report.models);
+    $("#cache-tokens").textContent = report.cacheTokens.toLocaleString();
+    renderModels(report.modelUsage);
     saveHistory(report.daily);
     $("#period").textContent = `Last ${report.days} days · updated ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
     setStatus("Report updated. Only local aggregates are displayed here.", "connected");
@@ -153,6 +170,7 @@ removeButton.addEventListener("click", async () => {
 async function initialize() {
   initializeTheme();
   renderHistory();
+  renderModels();
   try {
     if (await withTimeout(window.usage.hasKey(), 5000, "Startup check timed out. Try refreshing the app.")) await refresh();
     else setStatus("Add an Admin API key to load your official usage report.", "neutral");
