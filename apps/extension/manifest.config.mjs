@@ -6,5 +6,5 @@ export default {
   background: { service_worker: "src/background.ts", type: "module" },
   action: { default_popup: "src/popup.html", default_title: "Claude Usage" },
   content_scripts: [{ matches: ["https://claude.ai/*"], js: ["src/content.ts"], run_at: "document_start" }],
-  web_accessible_resources: [{ resources: ["src/injected.ts"], matches: ["https://claude.ai/*"] }]
+  web_accessible_resources: [{ resources: ["src/injected.ts", "icon.svg"], matches: ["https://claude.ai/*"] }]
 };
