@@ -13,6 +13,7 @@ const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
 const periodSelect = $("#period-select");
 const refreshIntervalSelect = $("#refresh-interval");
 const alertThresholdSelect = $("#alert-threshold");
+const historyRetentionSelect = $("#history-retention");
 let refreshTimer;
 const HISTORY_KEY = "usage-history";
 const exportCsvButton = $("#export-csv");
@@ -55,7 +56,8 @@ function saveHistory(daily) {
   const previous = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
   const merged = new Map(previous.map((entry) => [entry.date.slice(0, 10), entry]));
   for (const entry of daily || []) merged.set(entry.date.slice(0, 10), entry);
-  const history = [...merged.values()].sort((a, b) => a.date.localeCompare(b.date)).slice(-30);
+  const retention = Number(historyRetentionSelect?.value || 30);
+  const history = [...merged.values()].sort((a, b) => a.date.localeCompare(b.date)).slice(-retention);
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
   renderHistory(history);
 }
@@ -166,6 +168,8 @@ refreshIntervalSelect.addEventListener("change", configureAutoRefresh);
 configureAutoRefresh();
 alertThresholdSelect.value = localStorage.getItem("alert-threshold") || "0";
 alertThresholdSelect.addEventListener("change", () => { localStorage.setItem("alert-threshold", alertThresholdSelect.value); });
+historyRetentionSelect.value = localStorage.getItem("history-retention") || "30";
+historyRetentionSelect.addEventListener("change", () => { localStorage.setItem("history-retention", historyRetentionSelect.value); const retention = Number(historyRetentionSelect.value); const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]").slice(-retention); localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); renderHistory(history); });
 $("#key-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   const input = $("#key");
